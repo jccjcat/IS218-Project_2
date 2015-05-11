@@ -9,11 +9,11 @@
         <title>
             IS 218 - Program 2
         </title>
-		<style>
-		table, th, td {
-			border: 1px solid black;
-		}
-		</style>
+        <style>
+            table, th, td {
+                border: 1px solid black;
+            }
+        </style>
     </head>
     <body>
         <?php
@@ -29,6 +29,24 @@
                     $instance->connect();
                 }
                 return $instance;
+            }
+
+            public function retrieveSingleResult($query) {
+                $stmt = $this->connection->prepare($query);
+                $stmt->execute();
+                $result = $stmt->fetch();
+                return $result;
+            }
+
+            public function retrieveResults($query) {
+                $stmt = $this->connection->prepare($query);
+                $stmt->execute();
+                $result = $stmt->fetchAll();
+                return $result;
+            }
+
+            public function getConnection() {
+                return $this->connection;
             }
 
             private function connect() {
@@ -88,7 +106,66 @@ INS;
 
             public function generateResult($num) {
                 switch ($num) {
-                    
+                    case 1:
+                        $query = "select collegeids.id, collegeids.name, concat(round(((enrollment.women / enrollment.total) * 100 ),2),'%') as perc from collegeids join enrollment on collegeids.id=enrollment.id group by id order by perc desc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the highest percentage of women students</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with ' . $row['perc'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
+                    case 2:
+                        $query = "select collegeids.id, collegeids.name, concat(round(((enrollment.men / enrollment.total) * 100 ),2),'%') as perc from collegeids join enrollment on collegeids.id=enrollment.id group by id order by perc desc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the highest percentage of men students</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with ' . $row['perc'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
+                    case 3:
+                        $query = "select collegeids.id, collegeids.name, finance.endowment as en from collegeids join enrollment on collegeids.id=enrollment.id join finance on collegeids.id=finance.id group by id order by en desc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the largest endowment overall</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with $' . $row['en'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
+                    case 4:
+                        $query = "select collegeids.id, collegeids.name, enrollment.total as fmn from collegeids join enrollment on collegeids.id=enrollment.id join finance on collegeids.id=finance.id where enrollment.lev=4 group by id order by fmn desc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the largest enrollment of freshman</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with ' . $row['fmn'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
+                    case 5:
+                        $query = "select collegeids.id, collegeids.name, finance.tuition from collegeids join enrollment on collegeids.id=enrollment.id join finance on collegeids.id=finance.id group by id order by finance.tuition desc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the highest revenue from tuition</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with ' . $row['tuition'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
+                    case 6:
+                        $query = "select collegeids.id, collegeids.name, finance.tuition as t from collegeids join finance on collegeids.id=finance.id where finance.tuition > 0 group by id order by finance.tuition asc limit 10";
+                        $result = $this->dbUtil->retrieveResults($query);
+                        echo '<h3>Colleges with the lowest non zero tuition revenue</h3>';
+                        echo '<ul>';
+                        foreach ($result as $row) {
+                            echo '<li>' . $row['name'] . ' with $' . $row['t'] . '</li>';
+                        }
+                        echo '</ul>';
+                        break;
                 }
                 echo "<a href='" . $_SERVER['PHP_SELF'] . "'>Return to Menu</a>";
             }
