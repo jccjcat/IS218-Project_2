@@ -7,7 +7,7 @@
 <html>
     <head>
         <title>
-            IS 218 - Homework 3
+            IS 218 - Program 2
         </title>
 		<style>
 		table, th, td {
@@ -99,7 +99,7 @@ INS;
 
             public static $SQLHOST = 'localhost';
             public static $SQLUSER = 'test';
-            public static $SQLPASS = 'test';
+            public static $SQLPASS = 'password';
             public static $SQLDB = 'colleges';
 
         }
